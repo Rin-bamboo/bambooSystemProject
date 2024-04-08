@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Entity
+﻿namespace Model
 {
 
     public class TestTableEntity

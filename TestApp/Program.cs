@@ -2,8 +2,7 @@
 
 // See https://aka.ms/new-console-template for more information
 using Database;
-using System.Collections.Generic;
-using Entity;
+using Model;
 
 Console.WriteLine("Hello, World!");
 
@@ -13,18 +12,22 @@ EnvFileReader.LoadEnvFile("C:\\Users\\ngsk_\\OneDrive\\ドキュメント\\開�
 
 DBUtil dBUtil = new DBUtil();
 
-String Queary = "SELECT * FROM TestTable";
-
-TestTableEntity testTable = new();
-
-List<object> resultList = new();
-
-resultList = dBUtil.ExcecuteSqlQuery(Queary, null, testTable);
-
-
-foreach (TestTableEntity result in resultList)
+for (int i = 0; i < 1000; i++)
 {
-    testTable = result as TestTableEntity;
-    Console.WriteLine($"ID:{testTable.ID} | InsertDate:{testTable.InsertDate} | UpdateDate:{testTable.UpdateDate} | UpdateUser:{testTable.UpdateUser} | Count:{testTable.Count}");
-}
 
+    String Queary = "SELECT * FROM TestTable";
+
+    TestTableEntity testTable = new();
+
+    List<object> resultList = new();
+
+    resultList = dBUtil.ExcecuteSqlQuery(Queary, null, testTable);
+
+
+    foreach (TestTableEntity result in resultList)
+    {
+        testTable = result as TestTableEntity;
+        Console.WriteLine($"ID:{testTable.ID} | InsertDate:{testTable.InsertDate} | UpdateDate:{testTable.UpdateDate} | UpdateUser:{testTable.UpdateUser} | Count:{testTable.Count}");
+    }
+
+}

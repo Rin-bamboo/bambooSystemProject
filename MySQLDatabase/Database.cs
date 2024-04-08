@@ -1,7 +1,6 @@
 ﻿using log4net;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Database
@@ -9,7 +8,7 @@ namespace Database
     public class DBUtil
     {
         //DB接続情報
-        private static String? ConnectionString;
+        private static String? _ConnectionString;
 
         //トランザクション情報
         private static DbTransaction? Transaction = null;
@@ -60,7 +59,7 @@ namespace Database
                 throw new Exception($"環境変数に必要な情報が見つかりませんでした。\r\n必要な情報>>{ErrorMessage}");
             }
             // MySQLに接続するための接続文字列を構築
-            ConnectionString = $"Server={server};Database={database};Uid={username};Pwd={password};";
+            _ConnectionString = $"Server={server};Database={database};Uid={username};Pwd={password};";
             _AutoCommit = AutoCommitBool;
             DBOpen();
 
@@ -73,7 +72,7 @@ namespace Database
         /// <exception cref="Exception"></exception>
         protected void DBOpen()
         {
-            connection = new MySqlConnection(ConnectionString);
+            connection = new MySqlConnection(_ConnectionString);
             try
             {
                 connection.Open();

@@ -15,7 +15,12 @@ namespace Database
         private static DbTransaction? Transaction = null;
 
         //タイムアウト時間
-        private static int DBTimeout = 9999;
+        private static int _DBTimeout = 9999;
+        public int DBTimeout
+        {
+            get { return _DBTimeout; }
+            set { _DBTimeout = value; }
+        }
 
         //AutoCommitの設定
         private readonly Boolean _AutoCommit;

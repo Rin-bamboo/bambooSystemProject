@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Project">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="PropertyGroup">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TargetFramework" type="xs:string" />
+							<xs:element name="ImplicitUsings" type="xs:string" />
+							<xs:element name="Nullable" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" name="ItemGroup">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element minOccurs="0" name="None">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="CopyToOutputDirectory" type="xs:string" />
+									</xs:sequence>
+									<xs:attribute name="Update" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" name="ProjectReference">
+								<xs:complexType>
+									<xs:attribute name="Include" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" maxOccurs="unbounded" name="PackageReference">
+								<xs:complexType>
+									<xs:attribute name="Include" type="xs:string" use="required" />
+									<xs:attribute name="Version" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="Sdk" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

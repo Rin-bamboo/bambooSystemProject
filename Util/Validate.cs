@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns>nullや空白の場合はTrueそれ以外はFalseを返却します</returns>
-        public bool IsEmpty(object value)
+        public static bool IsEmpty(object value)
         {
             if (value == null) return true;
             return false;
@@ -20,7 +20,7 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns>nullや空白の場合はFalse、値が入っている場合はTrueを返却します</returns>
-        public bool IsNotEmpty(object value)
+        public static bool IsNotEmpty(object value)
         {
             return !IsEmpty(value);
         }
@@ -29,7 +29,7 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns>数値の場合はTrue そうじゃない場合はFalseを返却します</returns>
-        public bool IsNumeric(object value)
+        public static bool IsNumeric(object value)
         {
             if (value == null) return false;
             if ((value is string) &&
@@ -48,7 +48,7 @@
         /// <param name="value">チェックしたいデータ</param>
         /// <param name="Type">チャックしたいオブジェクトType Class等</param>
         /// <returns>一致している場合は Ture それ以外はFalse</returns>
-        public bool IsObjectCheck(Object value, Object Type)
+        public static bool IsObjectCheck(Object value, Object Type)
         {
             if (value.GetType() == Type.GetType())
             {
@@ -62,7 +62,7 @@
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <returns></returns>
-        public bool IsEqual(Object value1, Object value2)
+        public static bool IsEqual(Object value1, Object value2)
         {
             if (value1.Equals(value2))
             {

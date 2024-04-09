@@ -10,7 +10,7 @@ Console.WriteLine("Hello, World!");
 EnvFileReader.LoadEnvFile("C:\\Users\\ngsk_\\OneDrive\\ドキュメント\\開発ユーティリティ\\bambooSystem\\bambooSystemProject\\MySQLDatabase\\.env");
 
 
-DBUtil dBUtil = new DBUtil();
+DBUtil dBUtil = new();
 
 for (int i = 0; i < 1000; i++)
 {
@@ -19,12 +19,12 @@ for (int i = 0; i < 1000; i++)
 
     TestTableEntity testTable = new();
 
-    List<object> resultList = new();
+    List<object> resultList;
 
     resultList = dBUtil.ExcecuteSqlQuery(Queary, null, testTable);
 
 
-    foreach (TestTableEntity result in resultList)
+    foreach (TestTableEntity result in resultList.Cast<TestTableEntity>())
     {
         testTable = result as TestTableEntity;
         Console.WriteLine($"ID:{testTable.ID} | InsertDate:{testTable.InsertDate} | UpdateDate:{testTable.UpdateDate} | UpdateUser:{testTable.UpdateUser} | Count:{testTable.Count}");

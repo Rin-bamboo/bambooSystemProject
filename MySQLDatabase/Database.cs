@@ -15,7 +15,7 @@ namespace Database
 
         //タイムアウト時間
         private static int _DBTimeout = 9999;
-        public int DBTimeout
+        public static int DBTimeout
         {
             get { return _DBTimeout; }
             set { _DBTimeout = value; }
@@ -172,7 +172,7 @@ namespace Database
         /// <exception cref="Exception"></exception>
         public List<object> ExcecuteSqlQuery(String Query, Dictionary<string, String>? parameters = null, Object? EntityObj = null)
         {
-            MySqlCommand command = new MySqlCommand(Query, connection);
+            MySqlCommand command = new(Query, connection);
             try
             {
                 command.CommandTimeout = DBTimeout;
@@ -187,28 +187,26 @@ namespace Database
                     }
                 }
 
-                using (MySqlDataReader reader = command.ExecuteReader())
+                using MySqlDataReader reader = command.ExecuteReader();
+                List<string> columnNames = GetColumnNames(reader);
+                List<Dictionary<String, String?>> ResultListDic = [];
+
+                while (reader.Read())
                 {
-                    List<string> columnNames = GetColumnNames(reader);
-                    List<Dictionary<String, String?>> ResultListDic = [];
-
-                    while (reader.Read())
+                    Dictionary<string, string?> ResultDic = [];
+                    foreach (var columnName in columnNames)
                     {
-                        Dictionary<string, string?> ResultDic = [];
-                        foreach (var columnName in columnNames)
+                        if (!ResultDic.ContainsKey(columnName))
                         {
-                            if (!ResultDic.ContainsKey(columnName))
-                            {
-                                ResultDic.Add(columnName, reader[columnName].ToString());
-                            }
+                            ResultDic.Add(columnName, reader[columnName].ToString());
                         }
-                        ResultListDic.Add(ResultDic);
                     }
-
-                    List<Object> resutlData = SetEntityData(ResultListDic, EntityObj);
-
-                    return resutlData;
+                    ResultListDic.Add(ResultDic);
                 }
+
+                List<Object> resutlData = SetModelData(ResultListDic, EntityObj);
+
+                return resutlData;
             }
             catch (Exception e)
             {
@@ -218,9 +216,9 @@ namespace Database
             }
         }
 
-        protected List<string> GetColumnNames(MySqlDataReader reader)
+        protected static List<string> GetColumnNames(MySqlDataReader reader)
         {
-            List<string> columnNames = new();
+            List<string> columnNames = [];
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -230,40 +228,40 @@ namespace Database
             return columnNames;
         }
 
-        protected List<object> SetEntityData(List<Dictionary<String, String>> DbDataDicList, object? EntityObject)
+        protected List<object> SetModelData(List<Dictionary<String, String?>> DbDataDicList, object? ModelObject)
         {
             try
             {
 
-                if (EntityObject is null)
+                if (ModelObject is null)
                 {
                     log.Warn("オブジェクトが存在しません");
                     throw new Exception("オブジェクトが存在しません");
                 }
 
-                List<Object> ResultObjList = new();
+                List<Object> ResultObjList = [];
 
                 foreach (var DbDataDic in DbDataDicList)
                 {
 
-                    object clonedEntityObject = Activator.CreateInstance(EntityObject.GetType());
+                    object? clonedModelObject = Activator.CreateInstance(ModelObject.GetType()) ?? throw new Exception("オブジェクトのクローンに失敗しました");
 
                     foreach (var entry in DbDataDic)
                     {
                         //Object ResultObj = TryCast(ResultObj, EntityObjct.GetType());
 
                         string propertyName = entry.Key;
-                        string value = entry.Value;
+                        string? value = entry.Value;
 
                         // プロパティ名に対応する PropertyInfo オブジェクトを取得
-                        PropertyInfo propertyInfo = clonedEntityObject.GetType().GetProperty(propertyName);
+                        PropertyInfo? propertyInfo = clonedModelObject.GetType().GetProperty(propertyName);
 
                         // プロパティが存在するかを確認
                         if (propertyInfo != null && propertyInfo.CanWrite)
                         {
                             if (string.IsNullOrEmpty(value))
                             {
-                                propertyInfo.SetValue(clonedEntityObject, null);
+                                propertyInfo.SetValue(clonedModelObject, null);
                             }
                             else
                             {
@@ -274,20 +272,20 @@ namespace Database
                                     // 値がnullまたは空文字列の場合、プロパティにnullを設定
                                     // 値がnullまたは空文字列でない場合、値をDateTime型に変換してプロパティに設定
                                     object convertedValue = Convert.ChangeType(value, typeof(DateTime));
-                                    propertyInfo.SetValue(clonedEntityObject, convertedValue);
+                                    propertyInfo.SetValue(clonedModelObject, convertedValue);
                                 }
                                 else
                                 {
                                     if (propertyInfo.PropertyType == typeof(int?))
                                     {
                                         object convertedValue = Convert.ChangeType(value, typeof(int));
-                                        propertyInfo.SetValue(clonedEntityObject, convertedValue);
+                                        propertyInfo.SetValue(clonedModelObject, convertedValue);
                                     }
                                     else
                                     {
                                         // プロパティがNullable<DateTime>型でない場合、通常の変換を行う
                                         object convertedValue = Convert.ChangeType(value, propertyInfo.PropertyType);
-                                        propertyInfo.SetValue(clonedEntityObject, convertedValue);
+                                        propertyInfo.SetValue(clonedModelObject, convertedValue);
 
                                     }
                                 }
@@ -300,12 +298,12 @@ namespace Database
                         }
 
                     }
-                    ResultObjList.Add(clonedEntityObject);
+                    ResultObjList.Add(clonedModelObject);
                 }
                 return ResultObjList;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw new Exception("プロパティの設定で失敗しました");

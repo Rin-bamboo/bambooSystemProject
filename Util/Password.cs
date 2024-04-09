@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="Password"></param>
         /// <returns>ハッシュ化されたパスワードを返却</returns>
-        public string Hash(string Password)
+        public static string Hash(string Password)
         {
             return BCrypt.Net.BCrypt.HashPassword(Password);
         }
@@ -20,7 +20,7 @@
         /// <param name="input">入力された生のパスワード</param>
         /// <param name="comparison">DBのハッシュ化されたパスワード</param>
         /// <returns>ハッシュ化が一致していたらTrue 一致していなかったらFalse</returns>
-        public bool Validate(String input, string comparison)
+        public static bool Validate(String input, string comparison)
         {
             return BCrypt.Net.BCrypt.Verify(Hash(input), comparison);
         }

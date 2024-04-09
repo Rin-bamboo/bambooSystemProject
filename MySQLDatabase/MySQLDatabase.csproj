@@ -7,18 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="log4net.xml" />
+    <None Remove="MySQLDatabase.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.17" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Util\Util.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="App.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

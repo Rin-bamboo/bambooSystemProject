@@ -1,8 +1,8 @@
 ﻿
 
 // See https://aka.ms/new-console-template for more information
-using Database;
-using Model;
+using MySQLDatabase;
+using TestApp;
 
 Console.WriteLine("Hello, World!");
 
@@ -15,7 +15,7 @@ DBUtil dBUtil = new();
 for (int i = 0; i < 1000; i++)
 {
 
-    String Queary = "SELECT * FROM TestTable";
+    string Queary = "SELECT * FROM TestTable";
 
     TestTableEntity testTable = new();
 

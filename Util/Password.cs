@@ -1,4 +1,4 @@
-﻿namespace common
+﻿namespace Util
 {
     /// <summary>
     /// パスワードのハッシュ化共通処理
@@ -20,7 +20,7 @@
         /// <param name="input">入力された生のパスワード</param>
         /// <param name="comparison">DBのハッシュ化されたパスワード</param>
         /// <returns>ハッシュ化が一致していたらTrue 一致していなかったらFalse</returns>
-        public static bool Validate(String input, string comparison)
+        public static bool Validate(string input, string comparison)
         {
             return BCrypt.Net.BCrypt.Verify(Hash(input), comparison);
         }

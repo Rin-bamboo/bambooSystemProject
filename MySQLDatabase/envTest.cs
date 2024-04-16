@@ -1,4 +1,4 @@
-﻿namespace Database
+﻿namespace MySQLDatabase
 {
     public class EnvFileReader
     {

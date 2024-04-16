@@ -3,26 +3,20 @@ using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Reflection;
 
-namespace Database
+namespace MySQLDatabase
 {
     public class DBUtil
     {
         //DB接続情報
-        private static String? _ConnectionString;
+        private static string? _ConnectionString;
 
         //トランザクション情報
-        private static DbTransaction? Transaction = null;
+        private static DbTransaction? _Transaction = null;
 
-        //タイムアウト時間
-        private static int _DBTimeout = 9999;
-        public static int DBTimeout
-        {
-            get { return _DBTimeout; }
-            set { _DBTimeout = value; }
-        }
+        public static int DBTimeout { get; set; } = 9999;
 
-        //AutoCommitの設定
-        private readonly Boolean _AutoCommit;
+        //AutoCommitの設定 True:オートコミットする　False:オートコミットしない
+        private readonly bool _AutoCommit;
 
         //接続情報
         private MySqlConnection connection = new();
@@ -35,7 +29,7 @@ namespace Database
         /// </summary>
         /// <param name="AutoCommitBool">自動コミットの可否(True：自動コミットあり,False：自動コミット無し)</param>
         /// <exception cref="Exception"></exception>
-        public DBUtil(Boolean AutoCommitBool = true)
+        public DBUtil(bool AutoCommitBool = true)
         {
             log.Info("=====DB ConnectionProcess Start=====");
 
@@ -45,13 +39,13 @@ namespace Database
             string? username = Environment.GetEnvironmentVariable("DB_USERNAME");
             string? password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-            Boolean SettingCheckFlg = true;
-            List<String> ErrorList = [];
+            bool SettingCheckFlg = true;
+            List<string> ErrorList = [];
             if (server is null) { SettingCheckFlg = false; ErrorList.Add("DB_SERVER"); }
             if (database is null) { SettingCheckFlg = false; ErrorList.Add("DB_NAME"); }
             if (username is null) { SettingCheckFlg = false; ErrorList.Add("DB_USERNAME"); }
             if (password is null) { SettingCheckFlg = false; ErrorList.Add("DB_PASSWORD"); }
-            String ErrorMessage = String.Join(",", ErrorList);
+            string ErrorMessage = string.Join(",", ErrorList);
             if (SettingCheckFlg == false)
             {
                 //環境変数のエラーチェック
@@ -99,15 +93,15 @@ namespace Database
         /// <exception cref="Exception"></exception>
         protected void DBTransaction()
         {
-            if (Transaction is not null)
+            if (_Transaction is not null)
             {
-                String Message = "すでにトランザクションが開始されています。";
+                string Message = "すでにトランザクションが開始されています。";
                 log.Error(Message);
                 throw new Exception($"{Message}");
             }
             try
             {
-                Transaction = connection.BeginTransaction();
+                _Transaction = connection.BeginTransaction();
             }
             catch (Exception e) { throw new Exception($"トランザクションを開始できませんでした:{e}"); }
         }
@@ -120,13 +114,13 @@ namespace Database
         {
             try
             {
-                if (Transaction is null)
+                if (_Transaction is null)
                 {
                     log.Warn("トランザクションが開始されていません。コミットの必要はありません");
                 }
                 else
                 {
-                    Transaction.Commit();
+                    _Transaction.Commit();
                 }
             }
             catch (Exception e) { throw new Exception($"コミットに失敗しました:{e}"); }
@@ -139,11 +133,11 @@ namespace Database
         {
             try
             {
-                if (Transaction is null)
+                if (_Transaction is null)
                 {
                     log.Warn("トランザクションが開始されていません。ロールバックは行われません");
                 }
-                else { Transaction.Commit(); }
+                else { _Transaction.Commit(); }
             }
             catch (Exception e) { throw new Exception($"ロールバックに失敗しました:{e}"); }
 
@@ -170,7 +164,7 @@ namespace Database
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public List<object> ExcecuteSqlQuery(String Query, Dictionary<string, String>? parameters = null, Object? EntityObj = null)
+        public List<object> ExcecuteSqlQuery(string Query, Dictionary<string, string>? parameters = null, object? EntityObj = null)
         {
             MySqlCommand command = new(Query, connection);
             try
@@ -189,7 +183,7 @@ namespace Database
 
                 using MySqlDataReader reader = command.ExecuteReader();
                 List<string> columnNames = GetColumnNames(reader);
-                List<Dictionary<String, String?>> ResultListDic = [];
+                List<Dictionary<string, string?>> ResultListDic = [];
 
                 while (reader.Read())
                 {
@@ -204,13 +198,19 @@ namespace Database
                     ResultListDic.Add(ResultDic);
                 }
 
-                List<Object> resutlData = SetModelData(ResultListDic, EntityObj);
+                List<object> resutlData = SetModelData(ResultListDic, EntityObj);
+
+                if (_AutoCommit == true)
+                {
+                    DBCommit();
+                }
 
                 return resutlData;
             }
             catch (Exception e)
             {
                 log.Error(e);
+                DBRollback();
                 DBClose();
                 throw new Exception($"SQLクエリの実行中にエラーが発生しました:{e}");
             }
@@ -228,7 +228,7 @@ namespace Database
             return columnNames;
         }
 
-        protected List<object> SetModelData(List<Dictionary<String, String?>> DbDataDicList, object? ModelObject)
+        protected List<object> SetModelData(List<Dictionary<string, string?>> DbDataDicList, object? ModelObject)
         {
             try
             {
@@ -239,7 +239,7 @@ namespace Database
                     throw new Exception("オブジェクトが存在しません");
                 }
 
-                List<Object> ResultObjList = [];
+                List<object> ResultObjList = [];
 
                 foreach (var DbDataDic in DbDataDicList)
                 {

@@ -1,4 +1,4 @@
-﻿namespace common
+﻿namespace Util
 {
     /// <summary>
     /// 各データの検証を行います。
@@ -32,8 +32,8 @@
         public static bool IsNumeric(object value)
         {
             if (value == null) return false;
-            if ((value is string) &&
-                !(double.TryParse(value.ToString(), out _)))
+            if (value is string &&
+                !double.TryParse(value.ToString(), out _))
             {
                 return true;
             }
@@ -48,7 +48,7 @@
         /// <param name="value">チェックしたいデータ</param>
         /// <param name="Type">チャックしたいオブジェクトType Class等</param>
         /// <returns>一致している場合は Ture それ以外はFalse</returns>
-        public static bool IsObjectCheck(Object value, Object Type)
+        public static bool IsObjectCheck(object value, object Type)
         {
             if (value.GetType() == Type.GetType())
             {
@@ -62,7 +62,7 @@
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <returns></returns>
-        public static bool IsEqual(Object value1, Object value2)
+        public static bool IsEqual(object value1, object value2)
         {
             if (value1.Equals(value2))
             {
